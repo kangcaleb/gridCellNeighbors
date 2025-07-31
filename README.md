@@ -10,12 +10,12 @@ Utility class for computing the number of cells within a given Manhattan distanc
 #### Compile
 From project root run
 ```bash
-javac -d out src/org/ga/GridCellNeighbors.java
+javac -d target/classes src/main/java/org/ga/GridCellNeighbors.java
 ````
 
 #### Run
 ```bash
-java -cp out org.ga.GridCellNeighbors <distance> <path_to_csv>
+java -cp target/classes org.ga.GridCellNeighbors <distance> <path_to_csv>
 ```
 
 ### Arguments
@@ -36,8 +36,8 @@ java -cp out org.ga.GridCellNeighbors <distance> <path_to_csv>
 
 #### Commands
 ```bash
-javac -d out src/org/ga/GridCellNeighbors.java
-java -cp out org.ga.GridCellNeighbors 1 grid.csv
+javac -d target/classes src/main/java/org/ga/GridCellNeighbors.java
+java -cp target/classes org.ga.GridCellNeighbors 1 grid.csv
 ```
 #### Output
 ````text
