@@ -139,4 +139,36 @@ public class GridCellNeighborsTest {
         assertEquals(16, result);
     }
 
+    @Test
+    public void testNoPositivesReturn0() {
+        int[][] grid = new int[5][5];
+        int result = GridCellNeighbors.findNeighborCountOfPositives(grid, 3);
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void testAllPositives_ReturnsCountOfEveryCell() {
+        int[][] grid = new int[5][5];
+        for (int y = 0; y<grid.length; y++) {
+            for(int x = 0; x<grid[0].length; x++) {
+                grid[y][x] = 1;
+            }
+        }
+
+        int result = GridCellNeighbors.findNeighborCountOfPositives(grid, 1);
+        assertEquals(25, result);
+    }
+
+    @Test
+    public void testAllPositivesWithLargeDistance_ReturnsCountOfEveryCell() {
+        int[][] grid = new int[5][5];
+        for (int y = 0; y<grid.length; y++) {
+            for(int x = 0; x<grid[0].length; x++) {
+                grid[y][x] = 1;
+            }
+        }
+
+        int result = GridCellNeighbors.findNeighborCountOfPositives(grid, 10);
+        assertEquals(25, result);
+    }
 }
