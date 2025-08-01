@@ -3,6 +3,11 @@ package org.ga;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ *
+ * Default implementation of GridCellNeighbors uses
+ * "calculateManhattanDistance" to measure distance
+ */
 public class GridCellNeighborsTest {
 
     @Test

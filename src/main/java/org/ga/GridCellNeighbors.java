@@ -174,7 +174,7 @@ abstract class GridCellNeighbors {
     }
 
     protected static double getDistance(GridCoordinate coordinate) {
-        // return calculateEuclideanDistance(coordinate);
+        //return calculateEuclideanDistance(coordinate);
         return calculateManhattanDistance(coordinate);
     }
 
