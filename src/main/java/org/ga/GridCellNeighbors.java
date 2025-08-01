@@ -4,17 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 
-public class GridCellNeighbors {
+abstract class GridCellNeighbors {
 
     public static void main(String[] args) {
         System.out.println("DEBUG: main method entered");
@@ -80,7 +73,7 @@ public class GridCellNeighbors {
      *
      * @param path to csv as a String
      */
-    protected static void validateCsvFilepath(String path) {
+    private static void validateCsvFilepath(String path) {
         if (path.isBlank()) throw new IllegalArgumentException("Path to csv grid mustn't be blank");
         if (!path.endsWith(".csv")) throw new IllegalArgumentException("Expected a csv file but found path given was " + path);
     }
@@ -110,9 +103,10 @@ public class GridCellNeighbors {
      * @param n Maximum Manhattan distance from any positive cell
      * @return Count of unique cells within distance n of any positive cell
      */
-    public static int findNeighborCountOfPositives(int[][] grid, int n) {
+
+    static int findNeighborCountOfPositives(int[][] grid, int n) {
         PriorityQueue<GridCoordinate> distanceQueue = new PriorityQueue<>(
-                Comparator.comparingInt(GridCoordinate::getDistance)
+                Comparator.comparingDouble(GridCellNeighbors::getDistance)
         );
 
         for (int y = 0; y < grid.length; y++) {
@@ -121,7 +115,7 @@ public class GridCellNeighbors {
                     GridCoordinate positiveCell = new GridCoordinate.GridCoordinateBuilder()
                             .forGrid(grid)
                             .withCoordinates(y, x)
-                            .withDistance(0)
+                            .withDeltaFromPositive(0, 0)
                             .build();
                     distanceQueue.add(positiveCell);
                 }
@@ -133,7 +127,7 @@ public class GridCellNeighbors {
         while (!distanceQueue.isEmpty()) {
             GridCoordinate currentCell = distanceQueue.poll();
 
-            if (foundNeighbors.contains(currentCell) || currentCell.getDistance() > n) continue;
+            if (foundNeighbors.contains(currentCell) || getDistance(currentCell) > n) continue;
 
             foundNeighbors.add(currentCell);
 
@@ -156,27 +150,41 @@ public class GridCellNeighbors {
                 .forGrid(grid);
         GridCoordinate up = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY()-1, currentCell.getX())
-                .withDistance(currentCell.getDistance() + 1)
+                .withDeltaFromPositive(currentCell.getDeltaY()-1, currentCell.getDeltaX())
                 .build();
         if (up != null) distanceQueue.add(up);
 
         GridCoordinate left = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() - 1)
-                .withDistance(currentCell.getDistance() + 1)
+                .withDeltaFromPositive(currentCell.getDeltaY(), currentCell.getDeltaX() - 1)
                 .build();
         if (left != null) distanceQueue.add(left);
 
         GridCoordinate right = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() + 1)
-                .withDistance(currentCell.getDistance() + 1)
+                .withDeltaFromPositive(currentCell.getDeltaY(), currentCell.getDeltaX() + 1)
                 .build();
         if (right != null) distanceQueue.add(right);
 
         GridCoordinate down = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY() + 1, currentCell.getX())
-                .withDistance(currentCell.getDistance() + 1)
+                .withDeltaFromPositive(currentCell.getDeltaY() + 1, currentCell.getDeltaX())
                 .build();
         if (down != null) distanceQueue.add(down);
+    }
+
+    protected static double getDistance(GridCoordinate coordinate) {
+        // return calculateEuclideanDistance(coordinate);
+        return calculateManhattanDistance(coordinate);
+    }
+
+    private static double calculateManhattanDistance(GridCoordinate coordinate) {
+        return Math.abs(coordinate.getDeltaY()) + Math.abs(coordinate.getDeltaX());
+    }
+
+    private static double calculateEuclideanDistance(GridCoordinate coordinate) {
+        double sumOfSquaredDifferences = Math.pow(coordinate.getDeltaY(), 2) + Math.pow(coordinate.getDeltaX(), 2);
+        return Math.sqrt(sumOfSquaredDifferences);
     }
 }
 
@@ -187,12 +195,14 @@ public class GridCellNeighbors {
 class GridCoordinate {
     private final int y;
     private final int x;
-    private final int distance;
+    private final int deltaY;
+    private final int deltaX;
 
-    private GridCoordinate(int y, int x, int distance) {
-        this.y = y;
-        this.x = x;
-        this.distance = distance;
+    private GridCoordinate(GridCoordinateBuilder gridCoordinateBuilder) {
+        this.y = gridCoordinateBuilder.y;
+        this.x = gridCoordinateBuilder.x;
+        this.deltaY = gridCoordinateBuilder.deltaY;
+        this.deltaX = gridCoordinateBuilder.deltaX;
     }
 
     int getY() {
@@ -203,8 +213,12 @@ class GridCoordinate {
         return x;
     }
 
-    int getDistance() {
-        return distance;
+    int getDeltaY() {
+        return deltaY;
+    }
+
+    int getDeltaX() {
+        return deltaX;
     }
 
     @Override
@@ -227,19 +241,6 @@ class GridCoordinate {
     }
 
     /**
-     * Calculates Manhattan distance between two grid coordinates.
-     *
-     * @param y1 Row of first point
-     * @param x1 Column of first point
-     * @param y2 Row of second point
-     * @param x2 Column of second point
-     * @return Manhattan distance between the two points
-     */
-    static int calculateManhattanDistance(int y1, int x1, int y2, int x2) {
-        return Math.abs(y1-y2) + Math.abs(x1-x2);
-    }
-
-    /**
      * Builder class for creating valid GridCoordinate instances, with bounds checking
      * based on the grid size.
      */
@@ -247,7 +248,9 @@ class GridCoordinate {
         int[][] grid;
         int y;
         int x;
-        int distance;
+        int deltaY;
+        int deltaX;
+        double distance;
 
         GridCoordinateBuilder forGrid(int[][] grid) {
             this.grid = grid;
@@ -259,17 +262,17 @@ class GridCoordinate {
             return this;
         }
 
-        GridCoordinateBuilder withDistance(int distance) {
-            this.distance = distance;
+        GridCoordinateBuilder withDeltaFromPositive(int deltaY, int deltaX) {
+            this.deltaY = deltaY; this.deltaX = deltaX;
             return this;
         }
 
         GridCoordinate build() {
-            if (y < 0 || y >=grid.length) return null;
-            if (x < 0 || x >=grid[0].length) return null;
+            if (y < 0 || y >= grid.length) return null;
+            if (x < 0 || x >= grid[0].length) return null;
             if (distance < 0) return null;
 
-            return new GridCoordinate(y, x, distance);
+            return new GridCoordinate(this);
         }
     }
 }
