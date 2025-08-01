@@ -17,7 +17,6 @@ import java.util.Objects;
 public class GridCellNeighbors {
 
     public static void main(String[] args) {
-        System.out.println("DEBUG: main method entered");
 
         if (args.length != 2) {
             throw new IllegalArgumentException("Expected exactly 2 Arguments: " +
