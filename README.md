@@ -7,6 +7,10 @@ Utility class for computing the number of cells within a given Manhattan distanc
 
 
 ### Usage
+#### Clone
+```bash
+git clone https://github.com/kangcaleb/gridCellNeighbors.git
+```
 #### Compile
 From project root run
 ```bash
