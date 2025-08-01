@@ -10,11 +10,10 @@ import java.util.*;
 abstract class GridCellNeighbors {
 
     public static void main(String[] args) {
-        System.out.println("DEBUG: main method entered");
 
         if (args.length != 2) {
             throw new IllegalArgumentException("Expected exactly 2 Arguments: " +
-                    "An integer N representing the max Manhattan distance from any positive cell and " +
+                    "An integer N representing the max distance from any positive cell and " +
                     "A path to a csv file with a 2D grid of signed integers");
         }
 
@@ -22,7 +21,7 @@ abstract class GridCellNeighbors {
             // Validate Distance is Positive
             int distanceThreshold = Integer.parseInt(args[0]);
             if (distanceThreshold < 0) {
-                throw new IllegalArgumentException("Integer N representing the max Manhattan distance from any positive cell cannot be negative");
+                throw new IllegalArgumentException("Integer N representing the max distance from any positive cell cannot be negative");
             }
 
             // Validate CSV
@@ -62,7 +61,7 @@ abstract class GridCellNeighbors {
                 System.out.println("Error Parsing grid. Make sure your csv has only numbers separated by commas. Make sure each row is on a separated line");
             }
         } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Expected max Manhattan distance as an integer but failed to parse: " + nfe.getMessage());
+            throw new IllegalArgumentException("Expected max distance as an integer but failed to parse: " + nfe.getMessage());
         }
     }
 
@@ -95,12 +94,12 @@ abstract class GridCellNeighbors {
     }
 
     /**
-     * Computes the number of unique cells in the grid that are within a given Manhattan
+     * Computes the number of unique cells in the grid that are within a given
      * distance of any positive value in the grid. Positive cells include themselves in their neighborhood.
      * Uses a Breadth first approach to explore valid neighbors up to the given distance.
      *
      * @param grid 2D grid of signed integers
-     * @param n Maximum Manhattan distance from any positive cell
+     * @param n Maximum distance from any positive cell
      * @return Count of unique cells within distance n of any positive cell
      */
 
