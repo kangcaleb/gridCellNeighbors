@@ -142,4 +142,16 @@ public class GridCellNeighborsMainTest {
             assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
         }
     }
+
+    @Test
+    void testMain_emptyCsv_printsExpectedOutput() throws IOException {
+        Files.writeString(tempCsv, "");
+        int mockDistance = 2;
+
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()})
+        );
+
+        assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
+    }
 }
