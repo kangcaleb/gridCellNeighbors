@@ -210,6 +210,30 @@ public class GridCellNeighbors {
                 .withDistance(currentCell.getDistance() + 1)
                 .build();
         if (down != null) neighboringCells.add(down);
+
+        GridCoordinate upperLeft = gridCoordinateBuilder
+                .withCoordinates(currentCell.getY() - 1, currentCell.getX()-1)
+                .withDistance(currentCell.getDistance() + 1)
+                .build();
+        if (upperLeft != null) neighboringCells.add(upperLeft);
+
+        GridCoordinate upperRight = gridCoordinateBuilder
+                .withCoordinates(currentCell.getY() - 1, currentCell.getX()+1)
+                .withDistance(currentCell.getDistance() + 1)
+                .build();
+        if (upperRight != null) neighboringCells.add(upperRight);
+
+        GridCoordinate lowerRight = gridCoordinateBuilder
+                .withCoordinates(currentCell.getY() + 1, currentCell.getX()+1)
+                .withDistance(currentCell.getDistance() + 1)
+                .build();
+        if (lowerRight != null) neighboringCells.add(lowerRight);
+
+        GridCoordinate lowerLeft = gridCoordinateBuilder
+                .withCoordinates(currentCell.getY() + 1, currentCell.getX()-1)
+                .withDistance(currentCell.getDistance() + 1)
+                .build();
+        if (lowerLeft != null) neighboringCells.add(lowerLeft);
     }
 }
 
