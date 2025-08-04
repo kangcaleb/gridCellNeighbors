@@ -13,8 +13,14 @@ public class GridCoordinate {
     private final int deltaX;
 
     private GridCoordinate(GridCoordinateBuilder gridCoordinateBuilder) {
-        this.y = gridCoordinateBuilder.y;
-        this.x = gridCoordinateBuilder.x;
+        // Wrap Y and X coordinates if out of bounds so they are in bounds on opposite sides
+        int wrappedY = ((gridCoordinateBuilder.y % gridCoordinateBuilder.grid.length)
+                + gridCoordinateBuilder.grid.length) % gridCoordinateBuilder.grid.length;
+        int wrappedX = ((gridCoordinateBuilder.x % gridCoordinateBuilder.grid[0].length)
+                + gridCoordinateBuilder.grid[0].length) % gridCoordinateBuilder.grid[0].length;
+
+        this.y = wrappedY;
+        this.x = wrappedX;
         this.deltaY = gridCoordinateBuilder.deltaY;
         this.deltaX = gridCoordinateBuilder.deltaX;
     }
@@ -82,8 +88,6 @@ public class GridCoordinate {
         }
 
         GridCoordinate build() {
-            if (y < 0 || y >= grid.length) return null;
-            if (x < 0 || x >= grid[0].length) return null;
             if (distance < 0) return null;
 
             return new GridCoordinate(this);
