@@ -2,6 +2,7 @@ package org.ga;
 
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,6 +16,7 @@ public class GridCellNeighborsMainTest {
     static Path tempCsv;
     private static final PrintStream standardOut = System.out;
     private static final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+    private static final DistanceNeighborFinder distanceNeighborFinder = Mockito.spy(DistanceNeighborFinder.class);
 
     @BeforeAll
     static void setupCsv() throws IOException {
@@ -44,7 +46,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
@@ -114,7 +116,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
@@ -132,7 +134,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
