@@ -41,7 +41,7 @@ java -cp target/classes org.ga.GridCellNeighbors <distance> <path_to_csv>
 #### Commands
 ```bash
 javac -d target/classes src/main/java/org/ga/GridCellNeighbors.java
-java -cp target/classes org.ga.GridCellNeighbors 1 grid.csv
+java -cp target/classes org.ga.GridCellNeighbors 1 data/sampleGrid.csv
 ```
 #### Output
 ````text
