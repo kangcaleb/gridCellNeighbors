@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * When testing usage of Euclidean distance, make sure to use
  * "calculateEuclideanDistance" method is "getDistance" method
  */
-public class EuclideanDistanceNeighborFinderTest {
+public class EuclideanDistanceNeighborhoodFinderTest {
     EuclideanDistanceNeighborhoodFinder distanceNeighborFinder = Mockito.spy(EuclideanDistanceNeighborhoodFinder.class);
 
     @Test
@@ -58,7 +58,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[5][5];
         grid[2][2] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 10);
-        assertEquals(25, result); // All cells
+        assertEquals(25, result);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[6][6];
         grid[2][3] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(29, result); // Circle radius 3 on grid
+        assertEquals(27, result); // Circle radius 3 on grid
     }
 
     @Test
@@ -74,7 +74,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[22][22];
         grid[10][11] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 11);
-        assertEquals(381, result); // π*r^2 ≈ 3.14×121
+        assertEquals(375, result);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[11][11];
         grid[5][5] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(29, result); // Circle of radius 3 (approx π×9)
+        assertEquals(29, result);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[11][11];
         grid[7][1] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(22, result); // Some edge loss
+        assertEquals(23, result);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class EuclideanDistanceNeighborFinderTest {
         grid[7][3] = 1;
         grid[3][7] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 2);
-        assertEquals(21, result);
+        assertEquals(26, result);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class EuclideanDistanceNeighborFinderTest {
         grid[7][3] = 1;
         grid[6][5] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 2);
-        assertEquals(18, result);
+        assertEquals(22, result);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[11][1];
         grid[5][0] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(7, result); // vertical-only neighbors
+        assertEquals(7, result);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class EuclideanDistanceNeighborFinderTest {
         int[][] grid = new int[1][11];
         grid[0][5] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(7, result); // horizontal-only neighbors
+        assertEquals(7, result);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class EuclideanDistanceNeighborFinderTest {
         grid[2][2] = 1;
         grid[2][3] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 2);
-        assertEquals(21, result);
+        assertEquals(17, result);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class EuclideanDistanceNeighborFinderTest {
         grid[0][0] = 1;
         grid[0][4] = 1;
         int result = distanceNeighborFinder.findNeighborCountOfPositives(grid, 3);
-        assertEquals(16, result);
+        assertEquals(17, result);
     }
 
     @Test
