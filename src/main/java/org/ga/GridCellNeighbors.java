@@ -58,7 +58,7 @@ public class GridCellNeighbors {
                 // Print output
                 System.out.println("Grid Successfully Parsed:");
                 Arrays.stream(grid).map(Arrays::toString).forEach(System.out::println);
-                System.out.println("Number of Neighbors with distance " + distanceThreshold + ": " + findNeighborCountOfPositives(grid, distanceThreshold));
+                System.out.println(findNeighborCountOfPositives(grid, distanceThreshold) + " Neighbors within a manhattan distance of " + distanceThreshold);
 
             } catch (FileNotFoundException fnfe) {
                 throw new IllegalArgumentException(fnfe.getMessage());
