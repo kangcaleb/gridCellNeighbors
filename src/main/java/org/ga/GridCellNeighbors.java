@@ -4,7 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 abstract class GridCellNeighbors {
@@ -51,7 +58,7 @@ abstract class GridCellNeighbors {
                 // Print output
                 System.out.println("Grid Successfully Parsed:");
                 Arrays.stream(grid).map(Arrays::toString).forEach(System.out::println);
-                System.out.println("Number of Neighbors with distance " + distanceThreshold + ": " + findNeighborCountOfPositives(grid, distanceThreshold));
+                System.out.println(findNeighborCountOfPositives(grid, distanceThreshold) + " Neighbors within a manhattan distance of " + distanceThreshold);
 
             } catch (FileNotFoundException fnfe) {
                 throw new IllegalArgumentException(fnfe.getMessage());
@@ -102,11 +109,8 @@ abstract class GridCellNeighbors {
      * @param n Maximum distance from any positive cell
      * @return Count of unique cells within distance n of any positive cell
      */
-
-    static int findNeighborCountOfPositives(int[][] grid, int n) {
-        PriorityQueue<GridCoordinate> distanceQueue = new PriorityQueue<>(
-                Comparator.comparingDouble(GridCellNeighbors::getDistance)
-        );
+    public static int findNeighborCountOfPositives(int[][] grid, int n) {
+        Queue<GridCoordinate> neighboringCells = new LinkedList<>();
 
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -116,24 +120,24 @@ abstract class GridCellNeighbors {
                             .withCoordinates(y, x)
                             .withDeltaFromPositive(0, 0)
                             .build();
-                    distanceQueue.add(positiveCell);
+                    neighboringCells.add(positiveCell);
                 }
             }
         }
 
-        Set<GridCoordinate> foundNeighbors = new HashSet<>();
+        Set<GridCoordinate> foundNeighborSet = new HashSet<>();
 
-        while (!distanceQueue.isEmpty()) {
-            GridCoordinate currentCell = distanceQueue.poll();
+        while (!neighboringCells.isEmpty()) {
+            GridCoordinate currentCell = neighboringCells.poll();
 
-            if (foundNeighbors.contains(currentCell) || getDistance(currentCell) > n) continue;
+            if (foundNeighborSet.contains(currentCell) || getDistance(currentCell) > n) continue;
 
-            foundNeighbors.add(currentCell);
+            foundNeighborSet.add(currentCell);
 
-            addAdjacentNeighbors(grid, currentCell, distanceQueue);
+            addAdjacentNeighbors(grid, currentCell, neighboringCells);
         }
 
-        return foundNeighbors.size();
+        return foundNeighborSet.size();
     }
 
     /**
@@ -142,34 +146,34 @@ abstract class GridCellNeighbors {
      *
      * @param grid The original grid
      * @param currentCell The cell currently being processed
-     * @param distanceQueue The queue used to track cells to visit
+     * @param neighboringCells The queue used to track cells to visit
      */
-    private static void addAdjacentNeighbors(int[][] grid, GridCoordinate currentCell, PriorityQueue<GridCoordinate> distanceQueue) {
+    private static void addAdjacentNeighbors(int[][] grid, GridCoordinate currentCell, Queue<GridCoordinate> neighboringCells) {
         GridCoordinate.GridCoordinateBuilder gridCoordinateBuilder = new GridCoordinate.GridCoordinateBuilder()
                 .forGrid(grid);
         GridCoordinate up = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY()-1, currentCell.getX())
                 .withDeltaFromPositive(currentCell.getDeltaY()-1, currentCell.getDeltaX())
                 .build();
-        if (up != null) distanceQueue.add(up);
+        if (up != null) neighboringCells.add(up);
 
         GridCoordinate left = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() - 1)
                 .withDeltaFromPositive(currentCell.getDeltaY(), currentCell.getDeltaX() - 1)
                 .build();
-        if (left != null) distanceQueue.add(left);
+        if (left != null) neighboringCells.add(left);
 
         GridCoordinate right = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() + 1)
                 .withDeltaFromPositive(currentCell.getDeltaY(), currentCell.getDeltaX() + 1)
                 .build();
-        if (right != null) distanceQueue.add(right);
+        if (right != null) neighboringCells.add(right);
 
         GridCoordinate down = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY() + 1, currentCell.getX())
                 .withDeltaFromPositive(currentCell.getDeltaY() + 1, currentCell.getDeltaX())
                 .build();
-        if (down != null) distanceQueue.add(down);
+        if (down != null) neighboringCells.add(down);
     }
 
     protected static double getDistance(GridCoordinate coordinate) {
