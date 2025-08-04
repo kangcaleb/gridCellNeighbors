@@ -13,9 +13,22 @@ import java.util.Objects;
 import java.util.LinkedList;
 import java.util.Queue;
 
-
+/**
+ * Goal: Given a 2D Grid and a distance threshold N, find the number of neighboring
+ * cells within distance N af any positive integer in the grid.
+ */
 public class GridCellNeighbors {
 
+    /**
+     * Steps:
+     *
+     * 1. Validate arguments
+     * 2. Parse file line by line, turning each line into a row of integers to form grid
+     * 3. Validate grid
+     * 4. Call findTotalCellCountWithinRange to find neighbors of positives
+     *
+     * @param args distance threshold 'n', path to csv file
+     */
     public static void main(String[] args) {
 
         if (args.length != 2) {
@@ -31,7 +44,7 @@ public class GridCellNeighbors {
                 throw new IllegalArgumentException("Integer N representing the max Manhattan distance from any positive cell cannot be negative");
             }
 
-            // Validate CSV
+            // Validate CSV isn't blank and has correct ending
             String gridPath = args[1];
             validateCsvFilepath(gridPath);
 
@@ -43,29 +56,32 @@ public class GridCellNeighbors {
                 while ((line = reader.readLine()) != null) {
                     String[] tokens = line.replaceAll("\\s", "").split(",");
 
+                    // Filter out blank values and map line into int array
                     int[] row = Arrays.stream(tokens)
                             .filter(s -> !s.isBlank())
                             .mapToInt(Integer::parseInt)
                             .toArray();
 
-                    if (row.length > 0) rows.add(row);
+                    if (row.length > 0) rows.add(row); // Only add rows that have non-blank values
                 }
 
-                // Validate Grid
+                // Validate Grid isn't empty and has equal row lengths
                 int[][] grid = rows.toArray(new int[rows.size()][]);
                 validateGrid(grid);
 
                 // Print output
                 System.out.println("Grid Successfully Parsed:");
                 Arrays.stream(grid).map(Arrays::toString).forEach(System.out::println);
-                System.out.println(findNeighborCountOfPositives(grid, distanceThreshold) + " Neighbors within a manhattan distance of " + distanceThreshold);
+
+                // Call findTotalCellCountWithinRange, entry point of program
+                System.out.println(findTotalCellCountWithinRange(grid, distanceThreshold) + " Neighbors within a manhattan distance of " + distanceThreshold);
 
             } catch (FileNotFoundException fnfe) {
                 throw new IllegalArgumentException(fnfe.getMessage());
             } catch (NumberFormatException nfe) {
                 throw new IllegalArgumentException("Expected csv with only numbers separated by commas but failed to parse: " + nfe.getMessage());
             } catch (IOException ioe) {
-                System.out.println("Error Parsing grid. Make sure your csv has only numbers separated by commas. Make sure each row is on a separated line");
+                throw new RuntimeException("Error Parsing grid. Make sure your csv has only numbers separated by commas. Make sure each row is on a separated line");
             }
         } catch (NumberFormatException nfe) {
             throw new IllegalArgumentException("Expected max Manhattan distance as an integer but failed to parse: " + nfe.getMessage());
@@ -109,35 +125,54 @@ public class GridCellNeighbors {
      * @param n Maximum Manhattan distance from any positive cell
      * @return Count of unique cells within distance n of any positive cell
      */
-    public static int findNeighborCountOfPositives(int[][] grid, int n) {
-        Queue<GridCoordinate> neighboringCells = new LinkedList<>();
+    public static int findTotalCellCountWithinRange(int[][] grid, int n) {
+        Set<GridCoordinate> positives = findPositiveCellsForGrid(grid);
+
+        // foundNeighborSet keeps track of neighboring cells found and processed
+        Set<GridCoordinate> foundNeighborSet = new HashSet<>();
+
+        // NeighboringCells is queue used to store and process neighbors of positive cells.
+        // Positive cells include themselves in their neighborhood.
+        Queue<GridCoordinate> neighboringCells = new LinkedList<>(positives);
+
+        // Add neighboring cells to set and its own neighbors to queue for processing
+        while (!neighboringCells.isEmpty()) {
+            GridCoordinate neighbor = neighboringCells.poll();
+
+            // Neighbors already in foundNeighborSet OR lie outside distance threshold 'n' should be skipped
+            if (foundNeighborSet.contains(neighbor) || neighbor.getDistance() > n) continue;
+
+            // Mark we've processed current cell and it's direct neighbors for processing
+            foundNeighborSet.add(neighbor);
+            addAdjacentNeighbors(grid, neighbor, neighboringCells);
+        }
+
+        return foundNeighborSet.size(); // For now, we only want the count
+    }
+
+    /**
+     * Helper function that finds all positive numbers in a 2D array of integers
+     *
+     * @param grid: a 2D array of integers
+     * @return a Set of GridCoordinates representing the locations of the positives
+     */
+    private static Set<GridCoordinate> findPositiveCellsForGrid(int[][] grid) {
+        Set<GridCoordinate> positiveCells = new HashSet<>();
 
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
-                if (grid[y][x] > 0) {
+                if (grid[y][x] > 0) { // Count element at y,x because its positive
                     GridCoordinate positiveCell = new GridCoordinate.GridCoordinateBuilder()
                             .forGrid(grid)
                             .withCoordinates(y, x)
-                            .withDistance(0)
+                            .withDistance(0) // Positive cell is 0 distance away from positive cell
                             .build();
-                    neighboringCells.add(positiveCell);
+                    positiveCells.add(positiveCell);
                 }
             }
         }
 
-        Set<GridCoordinate> foundNeighborSet = new HashSet<>();
-
-        while (!neighboringCells.isEmpty()) {
-            GridCoordinate currentCell = neighboringCells.poll();
-
-            if (foundNeighborSet.contains(currentCell) || currentCell.getDistance() > n) continue;
-
-            foundNeighborSet.add(currentCell);
-
-            addAdjacentNeighbors(grid, currentCell, neighboringCells);
-        }
-
-        return foundNeighborSet.size();
+        return positiveCells;
     }
 
     /**
@@ -151,11 +186,12 @@ public class GridCellNeighbors {
     private static void addAdjacentNeighbors(int[][] grid, GridCoordinate currentCell, Queue<GridCoordinate> neighboringCells) {
         GridCoordinate.GridCoordinateBuilder gridCoordinateBuilder = new GridCoordinate.GridCoordinateBuilder()
                 .forGrid(grid);
+
         GridCoordinate up = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY()-1, currentCell.getX())
                 .withDistance(currentCell.getDistance() + 1)
                 .build();
-        if (up != null) neighboringCells.add(up);
+        if (up != null) neighboringCells.add(up); // Null means the "above" does not exist so don't add it
 
         GridCoordinate left = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() - 1)
@@ -179,12 +215,15 @@ public class GridCellNeighbors {
 
 /**
  * Represents a coordinate in the 2D grid, along with its distance from a source cell.
- * Equality and hashing are based only on coordinates (not distance)
+ * Equality and hashing are based only on coordinates (not distance). Distance
+ * represents the distance from a positive cell. This is used when processing neighbors
+ * to ensure we don't count neighboring cells whose distance are greater than the
+ * distance threshold 'n' (GridCoordinate.getDistance() > n)
  */
 class GridCoordinate {
     private final int y;
     private final int x;
-    private final int distance;
+    private final int distance; // Distance away from positive cell
 
     private GridCoordinate(int y, int x, int distance) {
         this.y = y;
@@ -200,6 +239,13 @@ class GridCoordinate {
         return x;
     }
 
+    /**
+     * The distance from a positive cell. Used to check we don't
+     * count neighboring cells whose distance is greater than
+     * the distance threshold 'n'
+     *
+     * @return an integer representing distance from positive
+     */
     int getDistance() {
         return distance;
     }
@@ -214,6 +260,13 @@ class GridCoordinate {
         return Objects.hash(y,x);
     }
 
+    /**
+     * GridCoordinates are equal if they share the same y and x values
+     *
+     * @param obj is the object with which to compare to this one
+     * @return true if the other obj is a GridCoordinate and it shares the same
+     * values for y and x
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GridCoordinate otherCoordinate) {
@@ -225,7 +278,8 @@ class GridCoordinate {
 
     /**
      * Builder class for creating valid GridCoordinate instances, with bounds checking
-     * based on the grid size.
+     * based on the grid size. If built with coordinates out of bounds for the specified
+     * grid, a null coordinate is returned
      */
     static class GridCoordinateBuilder {
         int[][] grid;
@@ -248,6 +302,14 @@ class GridCoordinate {
             return this;
         }
 
+        /**
+         *
+         * Instantiate a GridCoordinate using give values
+         *
+         * @return a GridCoordinate instance for specified grid
+         * distance and y and x values. Returns null if
+         * coordinates are out of bounds for the grid
+         */
         GridCoordinate build() {
             if (y < 0 || y >= grid.length) return null;
             if (x < 0 || x >= grid[0].length) return null;

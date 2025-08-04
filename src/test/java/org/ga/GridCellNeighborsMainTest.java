@@ -44,7 +44,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> GridCellNeighbors.findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
@@ -114,7 +114,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> GridCellNeighbors.findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
@@ -132,7 +132,7 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> GridCellNeighbors.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
+            mocked.when(() -> GridCellNeighbors.findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance)))
                     .thenReturn(7);
             mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
 
@@ -150,6 +150,28 @@ public class GridCellNeighborsMainTest {
 
         Exception e = assertThrows(IllegalArgumentException.class, () ->
                 GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()})
+        );
+
+        assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
+    }
+
+    @Test
+    void testMain_invalidCsvNonNumeric_throwsException() throws IOException {
+        Files.writeString(tempCsv, "1,a,3\n0,0,1");
+
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                GridCellNeighbors.main(new String[]{"2", tempCsv.toString()})
+        );
+
+        assertTrue(e.getMessage().contains("Expected csv with only numbers separated by commas"));
+    }
+
+    @Test
+    void testMain_onlyBlankLines_throwsException() throws IOException {
+        Files.writeString(tempCsv, "\n\n");
+
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                GridCellNeighbors.main(new String[]{"2", tempCsv.toString()})
         );
 
         assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
