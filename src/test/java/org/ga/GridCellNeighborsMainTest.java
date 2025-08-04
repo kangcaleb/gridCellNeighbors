@@ -51,7 +51,7 @@ public class GridCellNeighborsMainTest {
             GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
 
             assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
+            assertTrue(outputStreamCaptor.toString().contains("7 Neighbors within a manhattan distance of 2"));
         }
     }
 
@@ -121,7 +121,7 @@ public class GridCellNeighborsMainTest {
             GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
 
             assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
+            assertTrue(outputStreamCaptor.toString().contains("7 Neighbors within a manhattan distance of 2"));
         }
     }
 
@@ -139,7 +139,7 @@ public class GridCellNeighborsMainTest {
             GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
 
             assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
+            assertTrue(outputStreamCaptor.toString().contains("7 Neighbors within a manhattan distance of 2"));
         }
     }
 
