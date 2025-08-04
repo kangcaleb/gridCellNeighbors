@@ -123,10 +123,10 @@ public abstract class DistanceNeighborFinder {
     public abstract double getDistance(GridCoordinate coordinate);
 
     /**
-     * Factor method to create proper DistanceFinder
+     * Factory method to create proper DistanceNeighborFinder
      *
-     * @param type
-     * @return
+     * @param type of DistanceNeighborFinder to create
+     * @return ManhattanDistanceNeighborFinder or EuclideanDistanceNeighborhoodFinder
      */
     public static DistanceNeighborFinder createDistanceNeighborFinder(String type) {
         if (type.equals(Type.MANHATTAN.flag)) {
