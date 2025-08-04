@@ -8,9 +8,22 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
+/**
+ * Goal: Given a 2D Grid and a distance threshold N, find the number of neighboring
+ * cells within distance N af any positive integer in the grid.
+ */
 abstract class GridCellNeighbors {
 
+    /**
+     * Steps:
+     *
+     * 1. Validate arguments
+     * 2. Parse file line by line, turning each line into a row of integers to form grid
+     * 3. Validate grid
+     * 4. Call findTotalCellCountWithinRange to find neighbors of positives
+     *
+     * @param args distance threshold 'n', path to csv file
+     */
     public static void main(String[] args) {
 
         if (args.length != 3) {
@@ -23,7 +36,7 @@ abstract class GridCellNeighbors {
         try {
             // Validate Distance Calculation
             String distanceCalc = args[0];
-            DistanceNeighborFinder distanceNeighborFinder = DistanceNeighborFinder.createDistanceFinder(distanceCalc);
+            DistanceNeighborFinder distanceNeighborFinder = DistanceNeighborFinder.createDistanceNeighborFinder(distanceCalc);
 
             // Validate Distance is Positive
             int distanceThreshold = Integer.parseInt(args[1]);
@@ -31,7 +44,7 @@ abstract class GridCellNeighbors {
                 throw new IllegalArgumentException("Integer N representing the max distance from any positive cell cannot be negative");
             }
 
-            // Validate CSV
+            // Validate CSV isn't blank and has correct ending
             String gridPath = args[2];
             validateCsvFilepath(gridPath);
 
@@ -43,29 +56,32 @@ abstract class GridCellNeighbors {
                 while ((line = reader.readLine()) != null) {
                     String[] tokens = line.replaceAll("\\s", "").split(",");
 
+                    // Filter out blank values and map line into int array
                     int[] row = Arrays.stream(tokens)
                             .filter(s -> !s.isBlank())
                             .mapToInt(Integer::parseInt)
                             .toArray();
 
-                    if (row.length > 0) rows.add(row);
+                    if (row.length > 0) rows.add(row); // Only add rows that have non-blank values
                 }
 
-                // Validate Grid
+                // Validate Grid isn't empty and has equal row lengths
                 int[][] grid = rows.toArray(new int[rows.size()][]);
                 validateGrid(grid);
 
                 // Print output
                 System.out.println("Grid Successfully Parsed:");
                 Arrays.stream(grid).map(Arrays::toString).forEach(System.out::println);
-                System.out.println(distanceNeighborFinder.findNeighborCountOfPositives(grid, distanceThreshold) + " Neighbors within a manhattan distance of " + distanceThreshold);
+
+                // Call findTotalCellCountWithinRange, entry point of program
+                System.out.println(distanceNeighborFinder.findTotalCellCountWithinRange(grid, distanceThreshold) + " Neighbors within a distance of " + distanceThreshold);
 
             } catch (FileNotFoundException fnfe) {
                 throw new IllegalArgumentException(fnfe.getMessage());
             } catch (NumberFormatException nfe) {
                 throw new IllegalArgumentException("Expected csv with only numbers separated by commas but failed to parse: " + nfe.getMessage());
             } catch (IOException ioe) {
-                System.out.println("Error Parsing grid. Make sure your csv has only numbers separated by commas. Make sure each row is on a separated line");
+                throw new RuntimeException("Error Parsing grid. Make sure your csv has only numbers separated by commas. Make sure each row is on a separated line");
             }
         } catch (NumberFormatException nfe) {
             throw new IllegalArgumentException("Expected max distance as an integer but failed to parse: " + nfe.getMessage());

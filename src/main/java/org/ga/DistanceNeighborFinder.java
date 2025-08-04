@@ -25,8 +25,40 @@ public abstract class DistanceNeighborFinder {
      * @param n Maximum distance from any positive cell
      * @return Count of unique cells within distance n of any positive cell
      */
-    public int findNeighborCountOfPositives(int[][] grid, int n) {
-        Queue<GridCoordinate> neighboringCells = new LinkedList<>();
+    public int findTotalCellCountWithinRange(int[][] grid, int n) {
+        Set<GridCoordinate> positives = findPositiveCellsForGrid(grid);
+
+        // foundNeighborSet keeps track of neighboring cells found and processed
+        Set<GridCoordinate> foundNeighborSet = new HashSet<>();
+
+        // NeighboringCells is queue used to store and process neighbors of positive cells.
+        // Positive cells include themselves in their neighborhood.
+        Queue<GridCoordinate> neighboringCells = new LinkedList<>(positives);
+
+
+        // Add neighboring cells to set and its own neighbors to queue for processing
+        while (!neighboringCells.isEmpty()) {
+            GridCoordinate neighbor = neighboringCells.poll();
+
+            // Neighbors already in foundNeighborSet OR lie outside distance threshold 'n' should be skipped
+            if (foundNeighborSet.contains(neighbor) || getDistance(neighbor) > n) continue;
+
+            // Mark we've processed current cell and it's direct neighbors for processing
+            foundNeighborSet.add(neighbor);
+            addAdjacentNeighbors(grid, neighbor, neighboringCells);
+        }
+
+        return foundNeighborSet.size();
+    }
+
+    /**
+     * Helper function that finds all positive numbers in a 2D array of integers
+     *
+     * @param grid: a 2D array of integers
+     * @return a Set of GridCoordinates representing the locations of the positives
+     */
+    private static Set<GridCoordinate> findPositiveCellsForGrid(int[][] grid) {
+        Set<GridCoordinate> positives = new HashSet<>();
 
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -36,24 +68,12 @@ public abstract class DistanceNeighborFinder {
                             .withCoordinates(y, x)
                             .withDeltaFromPositive(0, 0)
                             .build();
-                    neighboringCells.add(positiveCell);
+                    positives.add(positiveCell);
                 }
             }
         }
 
-        Set<GridCoordinate> foundNeighborSet = new HashSet<>();
-
-        while (!neighboringCells.isEmpty()) {
-            GridCoordinate currentCell = neighboringCells.poll();
-
-            if (foundNeighborSet.contains(currentCell) || getDistance(currentCell) > n) continue;
-
-            foundNeighborSet.add(currentCell);
-
-            addAdjacentNeighbors(grid, currentCell, neighboringCells);
-        }
-
-        return foundNeighborSet.size();
+        return positives;
     }
 
     /**
@@ -71,7 +91,7 @@ public abstract class DistanceNeighborFinder {
                 .withCoordinates(currentCell.getY()-1, currentCell.getX())
                 .withDeltaFromPositive(currentCell.getDeltaY()-1, currentCell.getDeltaX())
                 .build();
-        if (up != null) neighboringCells.add(up);
+        if (up != null) neighboringCells.add(up); // Null means the "above" does not exist so don't add it
 
         GridCoordinate left = gridCoordinateBuilder
                 .withCoordinates(currentCell.getY(), currentCell.getX() - 1)
@@ -92,9 +112,23 @@ public abstract class DistanceNeighborFinder {
         if (down != null) neighboringCells.add(down);
     }
 
+    /**
+     * Gets distance from given GridCoordinate from positive cell. Used to determine
+     * if that cell is within the distance threshold 'n' of positive cell. Distance
+     * can be calculated in multiple ways which is why it's abstract.
+     *
+     * @param coordinate GridCoordinate of which to get distance from positive
+     * @return double representing the distance value.
+     */
     public abstract double getDistance(GridCoordinate coordinate);
 
-    public static DistanceNeighborFinder createDistanceFinder(String type) {
+    /**
+     * Factor method to create proper DistanceFinder
+     *
+     * @param type
+     * @return
+     */
+    public static DistanceNeighborFinder createDistanceNeighborFinder(String type) {
         if (type.equals(Type.MANHATTAN.flag)) {
             return new ManhattanDistanceNeighborFinder();
         } else if (type.equals(Type.EUCLIDEAN.flag)) {

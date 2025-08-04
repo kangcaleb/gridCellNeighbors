@@ -1,7 +1,6 @@
 package org.ga;
 
 import org.junit.jupiter.api.*;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,31 +43,25 @@ public class GridCellNeighborsMainTest {
     @Test
     void testMain_validInput_printsExpectedOutput()  {
         int mockDistance = 2;
+        doReturn(9).when(distanceNeighborFinder).findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance));
+        GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), tempCsv.toString()});
 
-        try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
-                    .thenReturn(7);
-            mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
-
-            GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
-
-            assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
-        }
+        assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
+        assertTrue(outputStreamCaptor.toString().contains("9 Neighbors within a distance of 2"));
     }
 
     @Test
     void testMain_invalidDistance_throwsException() {
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{"-1", tempCsv.toString()})
+                GridCellNeighbors.main(new String[]{"-m", "-1", tempCsv.toString()})
         );
-        assertTrue(e.getMessage().contains("cannot be negative"));
+        assertTrue(e.getMessage().contains("Integer N representing the max distance from any positive cell cannot be negative"));
     }
 
     @Test
     void testMain_invalidCsvPath_throwsException() {
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{"2", "nonexistent/path.csv"})
+                GridCellNeighbors.main(new String[]{"-m", "2", "nonexistent/path.csv"})
         );
         assertTrue(e.getMessage().contains("nonexistent/path.csv"));
     }
@@ -76,9 +69,9 @@ public class GridCellNeighborsMainTest {
     @Test
     void testMain_invalidDistanceFormat_throwsException() {
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{"abc", tempCsv.toString()})
+                GridCellNeighbors.main(new String[]{"-m", "abc", tempCsv.toString()})
         );
-        assertTrue(e.getMessage().contains("Expected max Manhattan distance as an integer"));
+        assertTrue(e.getMessage().contains("Expected max distance as an integer"));
     }
 
     @Test
@@ -94,7 +87,7 @@ public class GridCellNeighborsMainTest {
         Files.writeString(tempCsv, "1,0,0\n0,1,0\n0,0");
 
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{"2", tempCsv.toString()})
+                GridCellNeighbors.main(new String[]{"-m", "2", tempCsv.toString()})
         );
         assertTrue(e.getMessage().contains("All rows in grid need to have the same length"));
     }
@@ -104,7 +97,7 @@ public class GridCellNeighborsMainTest {
         Files.writeString(tempCsv, "");
 
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{"2", tempCsv.toString()})
+                GridCellNeighbors.main(new String[]{"-m", "2", tempCsv.toString()})
         );
         assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
     }
@@ -114,17 +107,12 @@ public class GridCellNeighborsMainTest {
         Files.writeString(tempCsv, "1,0,0\n0,1,0\n0,0,1\n");
 
         int mockDistance = 2;
+        doReturn(9).when(distanceNeighborFinder).findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance));
 
-        try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
-                    .thenReturn(7);
-            mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
+        GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), tempCsv.toString()});
 
-            GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
-
-            assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
-        }
+        assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
+        assertTrue(outputStreamCaptor.toString().contains("9 Neighbors within a distance of 2"));
     }
 
     @Test
@@ -132,17 +120,12 @@ public class GridCellNeighborsMainTest {
         Files.writeString(tempCsv, "1 ,0,0 \n0,1  ,0\n0     ,0,1\n");
 
         int mockDistance = 2;
+        doReturn(9).when(distanceNeighborFinder).findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance));
 
-        try (MockedStatic<GridCellNeighbors> mocked = mockStatic(GridCellNeighbors.class)) {
-            mocked.when(() -> distanceNeighborFinder.findNeighborCountOfPositives(any(int[][].class), eq(mockDistance)))
-                    .thenReturn(7);
-            mocked.when(() -> GridCellNeighbors.main(any())).thenCallRealMethod();
+        GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), tempCsv.toString()});
 
-            GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()});
-
-            assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
-            assertTrue(outputStreamCaptor.toString().contains("Number of Neighbors with distance 2: 7"));
-        }
+        assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
+        assertTrue(outputStreamCaptor.toString().contains("9 Neighbors within a distance of 2"));
     }
 
     @Test
@@ -151,7 +134,29 @@ public class GridCellNeighborsMainTest {
         int mockDistance = 2;
 
         Exception e = assertThrows(IllegalArgumentException.class, () ->
-                GridCellNeighbors.main(new String[]{String.valueOf(mockDistance), tempCsv.toString()})
+                GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), tempCsv.toString()})
+        );
+
+        assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
+    }
+
+    @Test
+    void testMain_invalidCsvNonNumeric_throwsException() throws IOException {
+        Files.writeString(tempCsv, "1,a,3\n0,0,1");
+
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                GridCellNeighbors.main(new String[]{"-m", "2", tempCsv.toString()})
+        );
+
+        assertTrue(e.getMessage().contains("Expected csv with only numbers separated by commas"));
+    }
+
+    @Test
+    void testMain_onlyBlankLines_throwsException() throws IOException {
+        Files.writeString(tempCsv, "\n\n");
+
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                GridCellNeighbors.main(new String[]{"-m", "2", tempCsv.toString()})
         );
 
         assertTrue(e.getMessage().contains("Expected a grid in csv but found none"));
