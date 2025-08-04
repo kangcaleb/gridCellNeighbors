@@ -41,10 +41,13 @@ public class GridCellNeighborsMainTest {
     }
 
     @Test
-    void testMain_validInput_printsExpectedOutput()  {
+    void testMain_validInput_printsExpectedOutput()  throws IOException {
+        Path testFile = Files.createTempFile("test-grid", ".csv");
+        Files.writeString(testFile, "1,0,0\n0,1,0\n0,0,1");
+
         int mockDistance = 2;
         doReturn(9).when(distanceNeighborFinder).findTotalCellCountWithinRange(any(int[][].class), eq(mockDistance));
-        GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), tempCsv.toString()});
+        GridCellNeighbors.main(new String[]{"-m", String.valueOf(mockDistance), testFile.toString()});
 
         assertTrue(outputStreamCaptor.toString().contains("Grid Successfully Parsed"));
         assertTrue(outputStreamCaptor.toString().contains("9 Neighbors within a distance of 2"));
